@@ -6,7 +6,10 @@ __pycache__/
 venv/
 .env/
 
-# App runtime data (DO NOT COMMIT)
+# IDE files
+.idea/
+
+# App runtime data
 *.pmgr
 *.bin
 settings.json
