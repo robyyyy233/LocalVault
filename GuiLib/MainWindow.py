@@ -4,8 +4,8 @@ import customtkinter as ctk
 from Resources import WindowsModule
 
 
-from MainWindowFunctions import MainWindowFunctions as MainFunctions
-from MainWindowFunctions import TabsFunctions as TabsFunctions
+from GuiLib.MainWindowFunctions import MainWindowFunctions as MainFunctions
+from GuiLib.MainWindowFunctions import TabsFunctions as TabsFunctions
 from NewTabTopLevel import SaveTab
 
 

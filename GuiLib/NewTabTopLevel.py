@@ -1,7 +1,6 @@
 import customtkinter as ctk
 
-from MainWindowFunctions import TabsFunctions as Tabs
-
+from GuiLib.MainWindowFunctions import TabsFunctions as Tabs
 
 
 class SaveTab(ctk.CTkToplevel):
