@@ -1,9 +1,9 @@
 import customtkinter as ctk
 from PIL import Image
 
+from GuiLib.LoginWindowFunctions import LoginWindowMainFunctions as MainFuncs
+from GuiLib.LoginWindowFunctions import LoginWindowSetupFunctions as SetupFuncs
 
-from LoginWindowFunctions import LoginWindowMainFunctions as MainFuncs
-from LoginWindowFunctions import LoginWindowSetupFunctions as SetupFuncs
 
 # For bitmap
 from Resources import WindowsModule
@@ -28,59 +28,64 @@ class LoginWindow(ctk.CTk):
         self.resizable(False, False)
 
         # Icon
-        self.icon_path = WindowsModule.get_path_to_BitMap()
-        self.iconbitmap(self.icon_path)
+        icon_path = WindowsModule.get_path_to_BitMap()
+        self.iconbitmap(icon_path)
 
-        # Grid: center column for content, side columns as flexible spacers
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=0)  # content column
-        self.grid_columnconfigure(2, weight=1)
+        self.rowconfigure((0,1,2), weight=1)
+        self.columnconfigure((0,1,2), weight=1)
 
-        # Rows:
-        # 0 = logo (fixed)
-        # 1 = spacer (expands)
-        # 2 = entry (fixed)
-        # 3 = spacer (expands)
-        self.grid_rowconfigure(0, weight=0)
-        self.grid_rowconfigure(1, weight=1)
-        self.grid_rowconfigure(2, weight=0)
-        self.grid_rowconfigure(3, weight=1)
+        self.MainFrame = ctk.CTkFrame(self, fg_color="transparent")
+        self.MainFrame.grid(row=0, column=0, rowspan=3, columnspan=3, padx=(10,10), pady=(10,10), sticky="nsew")
 
-        # --- Logo Frame (row 0) ---
-        self.logo_frame = ctk.CTkFrame(
-            self,
-            width=400,
-            height=110,  # slightly taller for image padding
-            corner_radius=10,
-            fg_color="transparent",
-        )
-        self.logo_frame.grid(row=0, column=1, padx=0, pady=(16, 8), sticky="n")
-        self.logo_frame.grid_propagate(False)
-        self.logo_frame.grid_columnconfigure((0, 1, 2), weight=1)
-        self.logo_frame.grid_rowconfigure(0, weight=1)
+        self.MainFrame.rowconfigure((0,1,2), weight=0)
+        self.MainFrame.columnconfigure((0,2), weight=0)
+        self.MainFrame.columnconfigure(1, weight=1)
 
-        # Logo Image
-        self.logo_path = SetupFuncs.get_path_to_logo()
-        self.logo_image = ctk.CTkImage(Image.open(self.logo_path), size=(100, 100))
 
-        self.logo = ctk.CTkLabel(self.logo_frame, image=self.logo_image, text="")
-        self.logo.grid(row=0, column=0, padx=0, pady=5, sticky="n")
 
-        # Logo Text (SafeKeep)
-        self.logo_text = ctk.CTkLabel(
-            self.logo_frame,
-            text="SafeKeep",
-            font=("Arial", 66, "bold"),
-            text_color="#FFFFFF",
-            fg_color="transparent",
-        )
-        self.logo_text.grid(row=0, column=1, padx=0, pady=15, sticky="n")
 
-        # Add a check if the user already has a master password set and change the text accordingly
-        # entry master password
-        self.masterEntry = ctk.CTkEntry(
-            self,
-            width=400,
+        #Logo + App Name
+        self.LogoFrame = ctk.CTkFrame(self.MainFrame, fg_color="transparent", height=75)
+        self.LogoFrame.grid(row=0, column=1, sticky="n")
+
+        self.LogoFrame.rowconfigure((0,1,2), weight=0)
+        self.LogoFrame.columnconfigure((0,1,2), weight=0)
+
+        #Logo
+        logo = Image.open(SetupFuncs.get_path_to_logo())
+        ctk_logo = ctk.CTkImage(dark_image=logo, size=(125,125))
+        self.Logo = ctk.CTkLabel(self.LogoFrame, image=ctk_logo, text="")
+        self.Logo.grid(row=0, column=0, sticky="nsew")
+
+        self.LogoLabel = ctk.CTkLabel(self.LogoFrame, text="LocalVault", font=("Arial", 66, "bold"), text_color="#ffffff")
+        self.LogoLabel.grid(row=0, column=1, sticky="ew")
+
+
+        #Settings frame + button
+        self.SettingsFrame = ctk.CTkFrame(self.MainFrame, fg_color="transparent", height=10, width=10)
+        self.SettingsFrame.grid(row=0, column=2, sticky="ne")
+
+        #settings image
+        settings_image = Image.open(SetupFuncs.get_path_to_settings_png())
+        ctk_settings_image = ctk.CTkImage(dark_image=settings_image, size=(40,40))
+        self.SettingsButton = ctk.CTkButton(self.SettingsFrame,image=ctk_settings_image, text="", fg_color="transparent", hover_color="#0f1215", width=10, height=10, cursor="hand2",
+                                            #todo:add command
+                                            )
+        self.SettingsButton.grid(row=0, column=0, sticky="nsew")
+
+
+
+        #Entry + show password button
+        self.EntryFrame = ctk.CTkFrame(self.MainFrame, fg_color="transparent", height=75, )
+        self.EntryFrame.grid(row=1, column=1, sticky="nsew", pady=(10,0))
+
+        self.EntryFrame.rowconfigure((0,1,2), weight=0)
+        self.EntryFrame.columnconfigure((0,1,2,3,4,5,6), weight=1)
+
+
+        #Master password entry
+        self.MasterPasswordEntry = ctk.CTkEntry(self.EntryFrame,
+            width=300,
             height=60,
             corner_radius=10,
             border_width=1,
@@ -92,74 +97,56 @@ class LoginWindow(ctk.CTk):
             font=("Arial", 28),
             placeholder_text="Enter Master Password",
             justify="left",
-            show="*",
-        )
-        self.masterEntry.grid(row=0, column=1, padx=10, pady=(90, 8), sticky="")
-        self.masterEntry.focus()
+            show="*",)
+        self.MasterPasswordEntry.grid(row=0, column=3, columnspan = 3, sticky="ew", padx=(10,0))
+
 
         # get show/hide password image
         self.showButtonImage = ctk.CTkImage(
             Image.open(
-                SetupFuncs.get_hidden_show_password_image(self.masterEntry, None)
+                SetupFuncs.get_hidden_show_password_image(self.MasterPasswordEntry, None)
             ),
             size=(30, 30),
         )
 
-        # frame for the show button
-        self.showButtonFrame = ctk.CTkFrame(
-            self,
-            width=40,
-            height=40,
-            corner_radius=10,
-            fg_color="transparent",
-        )
-        self.showButtonFrame.grid(
-            row=0, column=1, padx=(465, 0), pady=(90, 8), sticky=""
-        )
+        # Show master password button
+        self.ShowPasswordButton = ctk.CTkButton(self.EntryFrame,
+                                                width=40,
+                                                height=40,
+                                                corner_radius=10,
+                                                fg_color="transparent",
+                                                hover_color="#0f1215",
+                                                text="",
+                                                image=self.showButtonImage,
+                                                command=lambda: SetupFuncs.get_hidden_show_password_image(self.MasterPasswordEntry, self.ShowPasswordButton),)
+        self.ShowPasswordButton.grid(row=0, column=6, sticky="w", padx=(5,0))
 
-        # show/hide password button
-        self.showButton = ctk.CTkButton(
-            self.showButtonFrame,
-            width=40,
-            height=40,
-            corner_radius=10,
-            fg_color="transparent",
-            hover_color="#0f1215",
-            text="",
-            image=self.showButtonImage,
-            command=lambda: SetupFuncs.get_hidden_show_password_image(
-                self.masterEntry, self.showButton
-            ),
-        )
-        self.showButton.grid(row=0, column=1, padx=(0, 0), pady=(5, 8), sticky="")
+        #Login frame + button
+
+        self.LoginButtonFrame = ctk.CTkFrame(self.MainFrame, fg_color="transparent", height=50)
+        self.LoginButtonFrame.grid(row=2, column=0, columnspan=3, pady=(20,0), sticky="nsew")
+
+        self.LoginButtonFrame.rowconfigure((0,1,2), weight=0)
+        self.LoginButtonFrame.columnconfigure((0,1,2,3,4,5,6,7,8,9,10,11,12,13), weight=1)
+
 
         # Login button
-        self.login_button = ctk.CTkButton(
-            self,
-            width=100,
-            height=35,
-            corner_radius=10,
-            fg_color="#1E3A8A",
-            hover_color="#2E4FB2",
-            text_color="#FFFFFF",
-            text="Login",
-            font=("Arial", 20, "bold"),
-            command=lambda: MainFuncs.loginUser(
-                self.masterEntry.get(), self, self.masterEntry, folder_path
-            ),
-        )
-        self.login_button.grid(row=0, column=1, padx=0, pady=(235, 16), sticky="")
+        self.LoginButton = ctk.CTkButton(
+            self.LoginButtonFrame,
+            fg_color="#2563eb", text_color="#e6edf3",
+            text="Login", corner_radius=10, width=100, height=40, font=("Arial", 20, "bold"),
+            border_width=1, border_color="#1e3a8a", hover_color="#1d4ed8")
+        self.LoginButton.grid(row=0, column=10, sticky="ns", padx=(0,0))
 
-        # Bind enter to the login button
-        self.bind("<Return>", lambda event: self.login_button.invoke())
 
-        if not master_password_exists:
-            SetupFuncs.master_password_not_set_actions(
-                self.login_button, self.masterEntry, self, folder_path
-            )
+
+        
+
 
         # Handle window close event
         self.protocol("WM_DELETE_WINDOW", WindowsModule.on_close.__get__(self))
+        self.focus()
+        self.focus_force()
 
 
 if __name__ == "__main__":

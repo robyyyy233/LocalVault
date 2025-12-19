@@ -4,7 +4,8 @@ import sys
 from pathlib import Path
 import platform
 
-import LoginWindowMainFunctions as mainfuncs
+from . import LoginWindowMainFunctions as mainfuncs
+
 
 DEBUG_INFO: bool = False
 
@@ -70,6 +71,11 @@ def get_path_to_logo() -> str:
 
     logo_path = resource_path(f"Resources/{image}")
     return logo_path
+
+def get_path_to_settings_png() -> str:
+    image: str = "Settings.png"
+    png_path = resource_path(f"Resources/{image}")
+    return png_path
 
 
 def master_password_not_set_actions(
