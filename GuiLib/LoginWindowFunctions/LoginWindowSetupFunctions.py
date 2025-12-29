@@ -1,8 +1,11 @@
+import json
+import os
+
 import customtkinter as ctk
 from PIL import Image
 import sys
 from pathlib import Path
-import platform
+
 
 from . import LoginWindowMainFunctions as mainfuncs
 
@@ -92,3 +95,42 @@ def master_password_not_set_actions(
         )
     )
     master_entry.configure(placeholder_text="Set Master Password")
+
+
+
+def create_config() -> None:
+    #get appdata
+    appdata_path = os.environ.get("APPDATA")
+
+    if not appdata_path:
+        raise FileNotFoundError("AppData not found.")
+
+    # create folder
+    LocalVaultFolder = os.path.join(appdata_path, "LocalVault")
+    os.makedirs(LocalVaultFolder, exist_ok=True)
+
+
+    config_file = os.path.join(LocalVaultFolder, "config.json")
+
+    default_config = {
+        "Versions": {
+            "version": "1.0",
+            "vault_version": "1.0",
+        },
+        "Vault": {
+            "current_vault": "None",
+            "vault_version": "1.0",
+            "vault_magic_string": "LVPM",
+        }
+    }
+
+    # create config.json
+    if not os.path.exists(config_file):
+        with open(config_file, "w") as f:
+            json.dump(default_config, f, indent=4)
+    else: print("Config exists")
+
+
+
+if __name__ == "__main__":
+    create_config()

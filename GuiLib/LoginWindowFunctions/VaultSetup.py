@@ -1,8 +1,8 @@
 import os
 import json
 from datetime import datetime
-
-
+import secrets
+from pathlib import Path
 
 
 #todo: if first time use create the vault and write the metadata inside
@@ -16,7 +16,12 @@ def print_with_time(message: str) -> None:
 #todo: let the user chose the vault location
 #todo: let him chose if the vault exists and he only selects it or create a new one
 
-
+def get_config_file_path() -> Path:
+    #get config path
+    appdata_path = os.getenv("APPDATA")
+    folder_path = os.path.join(appdata_path, "LocalVault")
+    config_path = os.path.join(folder_path, "config.json")
+    return config_path
 
 
 def check_vault(folder_path) -> bool:
@@ -32,25 +37,44 @@ def check_vault(folder_path) -> bool:
 
 
 
-def create_vault(folder_path, salt, vault_id):
+def create_vault(vault_path: Path):
 
-    os.makedirs(folder_path, exist_ok=True)
+    config_path = get_config_file_path()
 
-    file_name = "Vault.bin"
-    vault_location = os.path.join(folder_path, file_name)
+    #open config
+    with open(config_path, "r") as config_read:
+        config = json.load(config_read)
+        vault_list = config["Vault"]
+        vault_version: str = vault_list["vault_version"]
+        vault_magic_string: str = vault_list["vault_magic_string"]
 
 
-    data = {"Metadata": {"Magic": "PasswordManager",
-                         "Version": 1,
-                         "Next_ID": 1,
+    #generate salt and vault id
+    salt_bytes = secrets.token_bytes(16)
+    vault_id = secrets.token_hex(16)
+
+    salt_hex = salt_bytes.hex()
+
+
+
+    data = {"Metadata": {"Magic": vault_magic_string,
+                         "Version": vault_version,
                          "kdf": "pbkdf2_hmac_sha256",
                          "iterations": 600_000,
-                         "salt": salt,
+                         "salt": salt_hex,
                          "vault_id": vault_id}}
 
 
-    with open(vault_location, "w") as file:
+
+    with open(vault_path, "w") as file:
         file.write(json.dumps(data, indent=4))
+        print(f"Created Vault : {vault_path.name}")
+        print(f"Vault path: {vault_path} ")
+
+
+    with open(config_path, "w") as config_write:
+        config["Vault"]["current_vault"] = str(vault_path)
+        json.dump(config, config_write, indent=4)
 
 
 

@@ -13,6 +13,9 @@ class LoginWindow(ctk.CTk):
     def __init__(self):
         super().__init__()
 
+        #creates the config file
+        SetupFuncs.create_config()
+
         # Create the folder to store the passwords
         folder_path = MainFuncs.create_folder()
         master_password_exists = MainFuncs.check_user_has_master_password(folder_path)
@@ -134,7 +137,7 @@ class LoginWindow(ctk.CTk):
         self.LoginButton = ctk.CTkButton(
             self.LoginButtonFrame,
             fg_color="#2563eb", text_color="#e6edf3",
-            text="Login", corner_radius=10, width=100, height=40, font=("Arial", 20, "bold"),
+            text="Unlock", corner_radius=10, width=100, height=40, font=("Arial", 20, "bold"),
             border_width=1, border_color="#1e3a8a", hover_color="#1d4ed8")
         self.LoginButton.grid(row=0, column=10, sticky="ns", padx=(0,0))
 
