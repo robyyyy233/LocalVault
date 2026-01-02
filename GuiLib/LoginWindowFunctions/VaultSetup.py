@@ -5,7 +5,6 @@ import secrets
 from pathlib import Path
 
 
-#todo: if first time use create the vault and write the metadata inside
 #todo: if second time use try to decrypt the vault if decrypt error InvalidToken show an error message box and close the app
 
 def print_with_time(message: str) -> None:
@@ -13,8 +12,7 @@ def print_with_time(message: str) -> None:
     print(f"[{time}]  {message}")
 
 
-#todo: let the user chose the vault location
-#todo: let him chose if the vault exists and he only selects it or create a new one
+
 
 def get_config_file_path() -> Path:
     #get config path

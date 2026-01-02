@@ -2,11 +2,14 @@ import json
 from pathlib import Path
 from tkinter import filedialog
 from tkinter import messagebox
+
+from customtkinter import CTkLabel
+
 from GuiLib.LoginWindowFunctions import VaultSetup as VaultSetup
 
 
 
-def show_current_vault_path(self):
+def show_current_vault_path(Label : CTkLabel, parts) -> None:
 
     config_path = VaultSetup.get_config_file_path()
     with open(config_path, "r") as config_file_r:
@@ -14,14 +17,21 @@ def show_current_vault_path(self):
 
     vault_path = Path(config["Vault"]["current_vault"])
 
-    vault_path_short = Path(*vault_path.parts[-2:])
+    vault_path_short = Path(*vault_path.parts[-parts:])
 
-    self.CurrentVault.configure(text=f"Current Vault: ...\\{vault_path_short} ", font=("Arial", 16, "bold"))
+    vault_path = str(vault_path)
+
+    if vault_path != "None":
+        Label.configure(text=f"Current Vault: ...\\{vault_path_short} ", font=("Arial", 16, "bold"))
+    else:
+        Label.configure(text=f"Current Vault: {vault_path_short} ", font=("Arial", 16, "bold"))
 
 
 
 
-def select_new_vault_path(self):
+
+
+def select_new_vault_path(Label: CTkLabel) -> None:
 
     #ask the user for the location of the vault
     full_path = filedialog.asksaveasfilename(
@@ -37,12 +47,12 @@ def select_new_vault_path(self):
 
 
     VaultSetup.create_vault(vault_path)
-    show_current_vault_path(self)
+    show_current_vault_path(Label, 2)
 
 
 
 
-def select_vault_path(self):
+def select_vault_path(Label: CTkLabel) -> None:
 
     #Let user chose file
     full_path = filedialog.askopenfilename(
@@ -81,7 +91,15 @@ def select_vault_path(self):
         config["Vault"]["current_vault"] = str(full_path)
         json.dump(config, config_file_w, indent=4)
 
-    show_current_vault_path(self)
+    show_current_vault_path(Label, 2)
+
+
+def on_close_toplevel(self, Label: CTkLabel) -> None:
+    self.destroy()
+    show_current_vault_path(Label, 3)
+
+
+
 
 
 

@@ -3,6 +3,8 @@ from PIL import Image
 
 from GuiLib.LoginWindowFunctions import LoginWindowMainFunctions as MainFuncs
 from GuiLib.LoginWindowFunctions import LoginWindowSetupFunctions as SetupFuncs
+from GuiLib.VaultWindowFunctions.VaultSelectFunctions import show_current_vault_path
+
 
 
 # For bitmap
@@ -15,6 +17,8 @@ class LoginWindow(ctk.CTk):
 
         #creates the config file
         SetupFuncs.create_config()
+
+
 
         # Create the folder to store the passwords
         folder_path = MainFuncs.create_folder()
@@ -40,7 +44,7 @@ class LoginWindow(ctk.CTk):
         self.MainFrame = ctk.CTkFrame(self, fg_color="transparent")
         self.MainFrame.grid(row=0, column=0, rowspan=3, columnspan=3, padx=(10,10), pady=(10,10), sticky="nsew")
 
-        self.MainFrame.rowconfigure((0,1,2), weight=0)
+        self.MainFrame.rowconfigure((0,1,2,3), weight=0)
         self.MainFrame.columnconfigure((0,2), weight=0)
         self.MainFrame.columnconfigure(1, weight=1)
 
@@ -72,7 +76,7 @@ class LoginWindow(ctk.CTk):
         settings_image = Image.open(SetupFuncs.get_path_to_settings_png())
         ctk_settings_image = ctk.CTkImage(dark_image=settings_image, size=(40,40))
         self.SettingsButton = ctk.CTkButton(self.SettingsFrame,image=ctk_settings_image, text="", fg_color="transparent", hover_color="#0f1215", width=10, height=10, cursor="hand2",
-                                            #todo:add command
+                                            command= lambda: SetupFuncs.show_vault_selection_window(self, self.CurrentVaultLabel)
                                             )
         self.SettingsButton.grid(row=0, column=0, sticky="nsew")
 
@@ -142,14 +146,30 @@ class LoginWindow(ctk.CTk):
         self.LoginButton.grid(row=0, column=10, sticky="ns", padx=(0,0))
 
 
+        #show current vault
+        self.CurrentVaultFrame = ctk.CTkFrame(self.MainFrame, fg_color="transparent", height=30)
+        self.CurrentVaultFrame.grid(row=3, column=0, columnspan=3,  sticky="sew", pady=(90,0))
 
-        
+        self.CurrentVaultLabel = ctk.CTkLabel(self.CurrentVaultFrame, text_color="#ffffff",)
+        self.CurrentVaultLabel.grid(row=0, column=0, sticky="ew", padx=(10,0))
+        show_current_vault_path(self.CurrentVaultLabel, 3)
+
+        self.focus()
+        self.focus_force()
+
+
+        # check if user saved a vault and if not open the window
+        if not SetupFuncs.check_saved_vault():
+            SetupFuncs.show_vault_selection_window(self, self.CurrentVaultLabel)
 
 
         # Handle window close event
         self.protocol("WM_DELETE_WINDOW", WindowsModule.on_close.__get__(self))
-        self.focus()
-        self.focus_force()
+
+
+
+
+
 
 
 if __name__ == "__main__":

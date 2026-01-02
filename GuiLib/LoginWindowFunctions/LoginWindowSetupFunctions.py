@@ -8,6 +8,8 @@ from pathlib import Path
 
 
 from . import LoginWindowMainFunctions as mainfuncs
+from GuiLib import SelectVaultWindow as VaultSelectWindow
+from .VaultSetup import get_config_file_path
 
 
 DEBUG_INFO: bool = False
@@ -131,6 +133,35 @@ def create_config() -> None:
     else: print("Config exists")
 
 
+#check if the config has a vault saved
+def check_saved_vault() -> bool:
+    config_path = get_config_file_path()
+
+    with open(config_path, "r") as config_read:
+        config = json.load(config_read)
+
+    current_vault = config["Vault"]["current_vault"]
+    print(f"Current Vault: {current_vault}")
+
+    if current_vault == "None":
+        return False
+
+    return True
+
+
+
+
+
+#show settings window
+def show_vault_selection_window(master, label) -> None:
+    window = VaultSelectWindow.SelectVaultWindow(master, label)  # should be a CTkToplevel
+    window.transient(master)
+    window.grab_set()
+    master.wait_window(window)
+
+
+
+
 
 if __name__ == "__main__":
-    create_config()
+    pass

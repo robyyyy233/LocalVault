@@ -7,7 +7,7 @@ from VaultWindowFunctions import VaultSelectFunctions as VaultSelectFuncs
 
 
 class SelectVaultWindow(ctk.CTkToplevel):
-    def __init__(self, master=None):
+    def __init__(self, master=None, CurrentVaultMain=None):
         super().__init__()
 
         # Appearance
@@ -38,7 +38,7 @@ class SelectVaultWindow(ctk.CTkToplevel):
         self.OpenVault = ctk.CTkButton(self.ButtonsFrame, fg_color="#2563eb", text_color="#e6edf3",
             text="Open Vault", corner_radius=10, width=125, height=50, font=("Arial", 20, "bold"),
             border_width=1, border_color="#1e3a8a", hover_color="#1d4ed8",
-            command=lambda: VaultSelectFuncs.select_vault_path(self))
+            command=lambda: VaultSelectFuncs.select_vault_path(self.CurrentVault))
         self.OpenVault.grid(row=0, column=0, sticky="ew", pady=(10,10), padx=(10,10))
 
         # Create Vault
@@ -46,7 +46,7 @@ class SelectVaultWindow(ctk.CTkToplevel):
                                        text="Create Vault", corner_radius=10, width=125, height=50,
                                        font=("Arial", 20, "bold"),
                                        border_width=1, border_color="#1e3a8a", hover_color="#1d4ed8",
-                                       command=lambda: VaultSelectFuncs.select_new_vault_path(self))
+                                       command=lambda: VaultSelectFuncs.select_new_vault_path(self.CurrentVault))
         self.CreateVault.grid(row=0, column=1, sticky="ew", pady=(10, 10), padx=(20, 10))
 
 
@@ -58,7 +58,14 @@ class SelectVaultWindow(ctk.CTkToplevel):
         #Current Vault Label
         self.CurrentVault = ctk.CTkLabel(self.CurrentVaultFrame, text_color="#ffffff", text="Current Vault: ", font=("Arial", 16, "bold"))
         self.CurrentVault.grid(row=0, column=0, sticky="ew")
-        VaultSelectFuncs.show_current_vault_path(self)
+        VaultSelectFuncs.show_current_vault_path(self.CurrentVault, 2)
+
+        self.attributes('-topmost', True)
+        self.update()
+        self.focus_force()
+
+
+        self.protocol("WM_DELETE_WINDOW", lambda: VaultSelectFuncs.on_close_toplevel(self, CurrentVaultMain))
 
 
 
