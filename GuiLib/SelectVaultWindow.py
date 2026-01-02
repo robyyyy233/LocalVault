@@ -3,8 +3,6 @@ import customtkinter as ctk
 from VaultWindowFunctions import VaultSelectFunctions as VaultSelectFuncs
 
 
-#todo: show this window if vault does not exist (first time use) -- add tomorow everything works for now
-
 
 class SelectVaultWindow(ctk.CTkToplevel):
     def __init__(self, master=None, CurrentVaultMain=None):
