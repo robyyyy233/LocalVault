@@ -163,6 +163,8 @@ class LoginWindow(ctk.CTk):
             SetupFuncs.show_vault_selection_window(self, self.CurrentVaultLabel)
 
 
+        print("test123")
+
         # Handle window close event
         self.protocol("WM_DELETE_WINDOW", WindowsModule.on_close.__get__(self))
 
