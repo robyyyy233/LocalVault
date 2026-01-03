@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from tkinter import filedialog
 from tkinter import messagebox
+import os
 
 from customtkinter import CTkLabel
 
@@ -94,13 +95,53 @@ def select_vault_path(Label: CTkLabel) -> None:
     show_current_vault_path(Label, 2)
 
 
+
+
+
 def on_close_toplevel(self, Label: CTkLabel) -> None:
     self.destroy()
     show_current_vault_path(Label, 3)
 
 
+def vault_not_in_saved_location() -> None:\
+    messagebox.showerror("Error!", "Vault not in the saved location!\n "
+                                   "Please select the new location!")
 
 
+def check_current_vault_available() -> bool:
+    config_path = VaultSetup.get_config_file_path()
+
+    with open(config_path, "r") as config_file_r:
+        config = json.load(config_file_r)
+        config_vault = config["Vault"]
+        current_vault =  config_vault["current_vault"]
+        magic_string = config_vault["vault_magic_string"]
+
+    current_vault = Path(current_vault)
+
+    #check if it's still there
+    if current_vault != None:
+        if os.path.exists(current_vault) and os.path.isfile(current_vault):
+            try:
+                with open(current_vault, "r") as vault_file:
+                    vault = json.load(vault_file)
+                    magic = vault["Metadata"]["Magic"]
+
+                if magic == magic_string:
+                    return True
+                else:
+                    return False
+
+            except (FileNotFoundError, PermissionError, json.JSONDecodeError):
+                print("Vault not in the location saved!")
+                vault_not_in_saved_location()
+                return False
+        else:
+            print("Vault not in the location saved!")
+            vault_not_in_saved_location()
+            return False
+    else:
+        return False
 
 
 

@@ -3,7 +3,7 @@ from PIL import Image
 
 from GuiLib.LoginWindowFunctions import LoginWindowMainFunctions as MainFuncs
 from GuiLib.LoginWindowFunctions import LoginWindowSetupFunctions as SetupFuncs
-from GuiLib.VaultWindowFunctions.VaultSelectFunctions import show_current_vault_path
+from GuiLib.VaultWindowFunctions.VaultSelectFunctions import show_current_vault_path, check_current_vault_available
 
 
 
@@ -162,8 +162,11 @@ class LoginWindow(ctk.CTk):
         if not SetupFuncs.check_saved_vault():
             SetupFuncs.show_vault_selection_window(self, self.CurrentVaultLabel)
 
+        #check if the current vault has been moved from saved location
+        if not check_current_vault_available():
+            SetupFuncs.show_vault_selection_window(self, self.CurrentVaultLabel)
 
-        print("test123")
+
 
         # Handle window close event
         self.protocol("WM_DELETE_WINDOW", WindowsModule.on_close.__get__(self))

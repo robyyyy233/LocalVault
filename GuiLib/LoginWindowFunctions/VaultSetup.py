@@ -5,14 +5,16 @@ import secrets
 from pathlib import Path
 
 
-#todo: if second time use try to decrypt the vault if decrypt error InvalidToken show an error message box and close the app
+
 
 def print_with_time(message: str) -> None:
     time = datetime.now().strftime("%H:%M:%S")
     print(f"[{time}]  {message}")
 
-
-
+def check_first_time_use() -> bool:
+    #todo: is first time use create the payload list and put the tabs inside first
+    #todo: change the entry label
+    pass
 
 def get_config_file_path() -> Path:
     #get config path
@@ -20,7 +22,6 @@ def get_config_file_path() -> Path:
     folder_path = os.path.join(appdata_path, "LocalVault")
     config_path = os.path.join(folder_path, "config.json")
     return config_path
-
 
 def check_vault(folder_path) -> bool:
     file_name = "Vault.dat"
@@ -53,8 +54,6 @@ def create_vault(vault_path: Path):
 
     salt_hex = salt_bytes.hex()
 
-
-
     data = {"Metadata": {"Magic": vault_magic_string,
                          "Version": vault_version,
                          "kdf": "pbkdf2_hmac_sha256",
@@ -62,13 +61,10 @@ def create_vault(vault_path: Path):
                          "salt": salt_hex,
                          "vault_id": vault_id}}
 
-
-
     with open(vault_path, "w") as file:
         file.write(json.dumps(data, indent=4))
         print(f"Created Vault : {vault_path.name}")
         print(f"Vault path: {vault_path} ")
-
 
     with open(config_path, "w") as config_write:
         config["Vault"]["current_vault"] = str(vault_path)
