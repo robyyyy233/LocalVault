@@ -10,6 +10,7 @@ from pathlib import Path
 from . import LoginWindowMainFunctions as mainfuncs
 from GuiLib import SelectVaultWindow as VaultSelectWindow
 from .VaultSetup import get_config_file_path
+from GuiLib.Resources import WindowsModule as WM
 
 
 DEBUG_INFO: bool = False
@@ -154,11 +155,13 @@ def check_saved_vault() -> bool:
 
 #show settings window
 def show_vault_selection_window(master, label) -> None:
-    window = VaultSelectWindow.SelectVaultWindow(master, label)  # should be a CTkToplevel
+
+
+    window = VaultSelectWindow.SelectVaultWindow(master, label)
     window.transient(master)
     window.grab_set()
+    window.focus_force()
     master.wait_window(window)
-
 
 
 

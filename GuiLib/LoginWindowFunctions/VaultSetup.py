@@ -3,18 +3,16 @@ import json
 from datetime import datetime
 import secrets
 from pathlib import Path
+import customtkinter as ctk
+from customtkinter import CTkButton
 
-
+from GuiLib.LoginWindowFunctions import VaultUnlock as vault_unlock
 
 
 def print_with_time(message: str) -> None:
     time = datetime.now().strftime("%H:%M:%S")
     print(f"[{time}]  {message}")
 
-def check_first_time_use() -> bool:
-    #todo: is first time use create the payload list and put the tabs inside first
-    #todo: change the entry label
-    pass
 
 def get_config_file_path() -> Path:
     #get config path
@@ -23,15 +21,33 @@ def get_config_file_path() -> Path:
     config_path = os.path.join(folder_path, "config.json")
     return config_path
 
-def check_vault(folder_path) -> bool:
-    file_name = "Vault.dat"
-    vault_location = folder_path + file_name
+def get_current_vault_path() -> Path:
+    config_path = get_config_file_path()
+    with open(config_path, "r") as config_read:
+        config = json.load(config_read)
 
-    if os.path.exists(vault_location):
-        print_with_time("Vault already exists")
-        return True
+    return config["Vault"]["current_vault"]
+
+
+def check_first_time_use(Entry: ctk.CTkEntry, Button: CTkButton) -> None:
+    # check if the vault has a payload
+    vault_path = get_current_vault_path()
+    if os.path.exists(vault_path):
+        try:
+            with open(vault_path, "r") as vault_read:
+                data = json.load(vault_read)
+
+            if not "Payload" in data:
+                print_with_time("First time use")
+
+                Entry.configure(placeholder_text="Create a master password")
+                Button.configure(text="Set")
+                Button.configure(command= lambda: vault_unlock.set_master_password())
+            else:
+                print_with_time("Vault already has master password")
+        except (FileNotFoundError, json.JSONDecodeError):
+            print_with_time("Failed to load Vault data")
     else:
-        print_with_time("Vault does not exist")
         return False
 
 

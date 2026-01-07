@@ -1,8 +1,8 @@
+from tkinter import PhotoImage
+
 import customtkinter as ctk
 
 from VaultWindowFunctions import VaultSelectFunctions as VaultSelectFuncs
-
-
 
 class SelectVaultWindow(ctk.CTkToplevel):
     def __init__(self, master=None, CurrentVaultMain=None):
@@ -63,7 +63,7 @@ class SelectVaultWindow(ctk.CTkToplevel):
         self.focus_force()
 
 
-        self.protocol("WM_DELETE_WINDOW", lambda: VaultSelectFuncs.on_close_toplevel(self, CurrentVaultMain))
+        self.protocol("WM_DELETE_WINDOW", lambda: VaultSelectFuncs.on_close_toplevel(self, CurrentVaultMain, master))
 
 
 

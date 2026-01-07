@@ -22,6 +22,9 @@ def show_current_vault_path(Label : CTkLabel, parts) -> None:
 
     vault_path = str(vault_path)
 
+    if Label == None:
+        return
+
     if vault_path != "None":
         Label.configure(text=f"Current Vault: ...\\{vault_path_short} ", font=("Arial", 16, "bold"))
     else:
@@ -98,9 +101,11 @@ def select_vault_path(Label: CTkLabel) -> None:
 
 
 
-def on_close_toplevel(self, Label: CTkLabel) -> None:
+def on_close_toplevel(self, Label: CTkLabel, master) -> None:
     self.destroy()
     show_current_vault_path(Label, 3)
+    if master:
+        master.mainloop()
 
 
 def vault_not_in_saved_location() -> None:\

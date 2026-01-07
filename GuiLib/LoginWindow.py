@@ -4,6 +4,7 @@ from PIL import Image
 from GuiLib.LoginWindowFunctions import LoginWindowMainFunctions as MainFuncs
 from GuiLib.LoginWindowFunctions import LoginWindowSetupFunctions as SetupFuncs
 from GuiLib.VaultWindowFunctions.VaultSelectFunctions import show_current_vault_path, check_current_vault_available
+from GuiLib.LoginWindowFunctions.VaultSetup import check_first_time_use
 
 
 
@@ -18,11 +19,9 @@ class LoginWindow(ctk.CTk):
         #creates the config file
         SetupFuncs.create_config()
 
-
-
         # Create the folder to store the passwords
         folder_path = MainFuncs.create_folder()
-        master_password_exists = MainFuncs.check_user_has_master_password(folder_path)
+        #master_password_exists = MainFuncs.check_user_has_master_password(folder_path)
 
         # Appearance
         ctk.set_appearance_mode("dark")
@@ -172,7 +171,7 @@ class LoginWindow(ctk.CTk):
         self.protocol("WM_DELETE_WINDOW", WindowsModule.on_close.__get__(self))
 
 
-
+        check_first_time_use(self.MasterPasswordEntry, self.LoginButton)
 
 
 
