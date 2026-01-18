@@ -2,11 +2,14 @@ import os
 import json
 from datetime import datetime
 import secrets
+from mailbox import mbox
 from pathlib import Path
 import customtkinter as ctk
 from customtkinter import CTkButton
+from tkinter import messagebox as mbox
+import base64
 
-from GuiLib.LoginWindowFunctions import VaultUnlock as vault_unlock
+from GuiLib.LoginWindowFunctions import VaultUnlock as VaultUnlock
 
 
 def print_with_time(message: str) -> None:
@@ -42,7 +45,7 @@ def check_first_time_use(Entry: ctk.CTkEntry, Button: CTkButton) -> None:
 
                 Entry.configure(placeholder_text="Create a master password")
                 Button.configure(text="Set")
-                Button.configure(command= lambda: vault_unlock.set_master_password())
+                Button.configure(command= lambda: VaultUnlock.set_master_password())
             else:
                 print_with_time("Vault already has master password")
         except (FileNotFoundError, json.JSONDecodeError):
@@ -88,6 +91,34 @@ def create_vault(vault_path: Path):
 
 
 
+def create_payload() -> None:
+    current_vault_path = get_current_vault_path()
+
+    try:
+        with open(current_vault_path, "r") as current_vault_file:
+            data = json.load(current_vault_file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        mbox.showerror("Error", "An error occurred while setting the master password.\nPlease try again.")
+        return
+
+    payload =  {"Tabs": ["All"],"Passwords": []}
+
+    if "Payload" not in data:
+        encoded_payload = base64.urlsafe_b64encode(json.dumps(payload, separators=(',', ':')).encode("utf-8"))
+        print(encoded_payload)
+        decoded_back = json.loads(base64.urlsafe_b64decode(encoded_payload).decode("utf-8"))
+        print(decoded_back)
+
+        data["Payload"] = encoded_payload.decode("utf-8")
+
+
+    try:
+        with open(current_vault_path, "w") as current_vault_file:
+            json.dump(data, current_vault_file, indent=4)
+    except (FileNotFoundError, json.JSONDecodeError):
+        mbox.showerror("Error", "An error occurred while setting the master password.\nPlease try again.")
+        return
+
 
 if __name__ == "__main__":
-    pass
+    create_payload()

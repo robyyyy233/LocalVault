@@ -2,7 +2,7 @@ from tkinter import PhotoImage
 
 import customtkinter as ctk
 
-from VaultWindowFunctions import VaultSelectFunctions as VaultSelectFuncs
+from .VaultWindowFunctions import VaultSelectFunctions as VaultSelectFuncs
 
 class SelectVaultWindow(ctk.CTkToplevel):
     def __init__(self, master=None, CurrentVaultMain=None):

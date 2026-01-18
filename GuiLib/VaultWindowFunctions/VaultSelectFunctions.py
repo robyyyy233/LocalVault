@@ -33,8 +33,6 @@ def show_current_vault_path(Label : CTkLabel, parts) -> None:
 
 
 
-
-
 def select_new_vault_path(Label: CTkLabel) -> None:
 
     #ask the user for the location of the vault
@@ -52,7 +50,6 @@ def select_new_vault_path(Label: CTkLabel) -> None:
 
     VaultSetup.create_vault(vault_path)
     show_current_vault_path(Label, 2)
-
 
 
 
@@ -99,8 +96,6 @@ def select_vault_path(Label: CTkLabel) -> None:
 
 
 
-
-
 def on_close_toplevel(self, Label: CTkLabel, master) -> None:
     self.destroy()
     show_current_vault_path(Label, 3)
@@ -108,19 +103,22 @@ def on_close_toplevel(self, Label: CTkLabel, master) -> None:
         master.mainloop()
 
 
-def vault_not_in_saved_location() -> None:\
-    messagebox.showerror("Error!", "Vault not in the saved location!\n "
-                                   "Please select the new location!")
+def vault_not_in_saved_location() -> None:
+    messagebox.showinfo("Vault Selection", "No vault selected\n "
+                                   "Please select or create a vault")
 
 
 def check_current_vault_available() -> bool:
     config_path = VaultSetup.get_config_file_path()
+
+    print("Configuration file: ", config_path)
 
     with open(config_path, "r") as config_file_r:
         config = json.load(config_file_r)
         config_vault = config["Vault"]
         current_vault =  config_vault["current_vault"]
         magic_string = config_vault["vault_magic_string"]
+
 
     current_vault = Path(current_vault)
 

@@ -26,7 +26,7 @@ def resource_path(relative_path):
     return base_path / relative_path
 
 
-def get_hidden_show_password_image(entry, showButton):
+def get_hidden_show_password_image(entry, showButton=None):
 
     image_show: str = "ShowPassword.png"
     image_hide: str = "HidePassword.png"
@@ -148,8 +148,6 @@ def check_saved_vault() -> bool:
         return False
 
     return True
-
-
 
 
 
