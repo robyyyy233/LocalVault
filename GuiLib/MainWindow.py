@@ -9,9 +9,8 @@ from GuiLib.MainWindowFunctions import TabsFunctions as TabsFunctions
 from NewTabTopLevel import SaveTab
 
 
-
 class MainWindow(ctk.CTk):
-    def __init__(self): #add the key here
+    def __init__(self):  # add the key here
         super().__init__()
 
         self.lift()
@@ -37,7 +36,7 @@ class MainWindow(ctk.CTk):
         self.icon_path = WindowsModule.get_path_to_BitMap()
         self.iconbitmap(self.icon_path)
 
-        #Create settings tab
+        # Create settings tab
         settings_path = MainFunctions.create_settings_json()
         TabsFunctions.add_default_tab(settings_path)
 
@@ -60,22 +59,27 @@ class MainWindow(ctk.CTk):
             row=0, column=0, sticky="nsw", rowspan=3, padx=(10, 10), pady=(10, 10)
         )
 
-        self.left_frame.rowconfigure((0,1,2,3,4), weight=1)
+        self.left_frame.rowconfigure((0, 1, 2, 3, 4), weight=1)
         self.left_frame.rowconfigure(5, weight=1)
 
-
-        self.TabsFrameLocation = ctk.CTkScrollableFrame(self.left_frame, fg_color="transparent", width=180
-                                                        ,scrollbar_button_color="#151A22",
-                                                        scrollbar_button_hover_color="#1D2F60")
+        self.TabsFrameLocation = ctk.CTkScrollableFrame(
+            self.left_frame,
+            fg_color="transparent",
+            width=180,
+            scrollbar_button_color="#151A22",
+            scrollbar_button_hover_color="#1D2F60",
+        )
         self.TabsFrameLocation.grid(row=0, column=0, rowspan=5, sticky="nsew")
 
-        #render tabs
-        self.buttons: list = TabsFunctions.render_tabs(self, settings_path, self.TabsFrameLocation)
+        # render tabs
+        self.buttons: list = TabsFunctions.render_tabs(
+            self, settings_path, self.TabsFrameLocation
+        )
 
-
-        self.button_tabs = ctk.CTkFrame(self.left_frame, fg_color="transparent", width=180, height=60)
+        self.button_tabs = ctk.CTkFrame(
+            self.left_frame, fg_color="transparent", width=180, height=60
+        )
         self.button_tabs.grid(row=6, column=0, sticky="nsew")
-
 
         # New tab button
         self.new_tab_button = ctk.CTkButton(
@@ -88,12 +92,11 @@ class MainWindow(ctk.CTk):
             hover_color="#233A78",
             text_color="#FFFFFF",
             corner_radius=3,
-            command=lambda: TabsFunctions.show_top_level(self, SaveTab, self.TabsFrameLocation)
+            command=lambda: TabsFunctions.show_top_level(
+                self, SaveTab, self.TabsFrameLocation
+            ),
         )
-        self.new_tab_button.grid(
-            row=0, column=0, padx=(0,5), pady=(0,7 ), sticky="ew"
-        )
-
+        self.new_tab_button.grid(row=0, column=0, padx=(0, 5), pady=(0, 7), sticky="ew")
 
         self.delete_tab_button = ctk.CTkButton(
             self.button_tabs,
@@ -113,11 +116,11 @@ class MainWindow(ctk.CTk):
                 "buttons",  # name of the attribute where you want to store the list
                 TabsFunctions.delete_button_tab_configurate(
                     self, delete_tab_mode, b, self.TabsFrameLocation
-                )
+                ),
             )
         )
         self.delete_tab_button.grid(
-            row=0, column=1, padx=(0,0), pady=(0, 7), sticky="ew"
+            row=0, column=1, padx=(0, 0), pady=(0, 7), sticky="ew"
         )
 
         # Separator (middle)
@@ -193,8 +196,6 @@ class MainWindow(ctk.CTk):
             font=("Arial", 20),
         )
         self.passwordListLabel.place(relx=0.5, rely=0.5, anchor="center")
-
-
 
         # Handle window close
         self.protocol("WM_DELETE_WINDOW", WindowsModule.on_close.__get__(self))
