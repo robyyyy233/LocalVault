@@ -17,3 +17,6 @@ settings.json
 # OS junk
 .DS_Store
 Thumbs.db
+
+# ignore vscode
+.vscode/

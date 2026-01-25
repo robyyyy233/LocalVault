@@ -69,47 +69,33 @@ def derive_key(password: str) -> bytes:
     return
 
 
-
-def encrypt(key: bytes) -> bytes:
-    payload = get_payload()
-    encoded_payload = base64.urlsafe_b64encode(
-        json.dumps(payload, separators=(",", ":")).encode("utf-8")
-    )
-
-
-    #add a check here if there is already encrypted payload
-    #so for fernet it starting with 'gAAAAAB'
-
-    check_prefix = payload[:7]
-    if check_prefix == "gAAAAAB":
-        raise RuntimeError("ERROR! Payload is already encrypted cannot encrypt twice")
-
-
+def encrypt(key: bytes, data: bytes) -> bytes:
     fernet = Fernet(key)
-    payload_encr = fernet.encrypt(encoded_payload)
+    encrypted = fernet.encrypt(data)
 
+    return encrypted
 
-    del payload
-    del check_prefix
-
-    # write it to the vault
-    vault_path = VaultSetup.get_current_vault_path()
-
-    try:
-        with open(vault_path, "r") as fr:
-            data = json.load(fr)
-
-        data["Payload"] = payload_encr.decode()
-        print(data)
-
-        with open(vault_path, "w") as fw:
-            json.dump(data, fw, indent=4)
-    except (FileNotFoundError, json.decoder.JSONDecodeError):
-        print("Error while writing encrypted payload back to vault")
 
 
 def decrypt(key: bytes) -> bytes:
-    pass
+    vault_path = VaultSetup.get_current_vault_path()
+    
+    try:
+        with open(vault_path, "r") as vr:
+            data = json.load(vr)
+            enc_payload = data["Payload"]
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        raise RuntimeError(e)
+    
+    # add later error handling for wrong password
+    # if decryption fails show messagebox error
+    # and return to login window
+
+    fernet = Fernet(key)
+    decrypted_payload = fernet.decrypt(enc_payload)
+
+    return decrypted_payload
+
 
 
 def ask_sure_password() -> bool:
@@ -148,4 +134,7 @@ def set_master_password(Entry: ctk.CTkEntry) -> None:
 
 if __name__ == "__main__":
     key = derive_key("1323")
-    encrypt(key)
+    decrypted_data = decrypt(key)
+    print(decrypted_data.decode())
+
+    #debug later somewhere is encoded twice

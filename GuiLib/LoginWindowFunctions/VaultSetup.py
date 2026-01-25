@@ -108,17 +108,8 @@ def create_payload() -> None:
 
     payload = {"Tabs": ["All"], "Passwords": []}
 
-    if "Payload" not in data:
-        encoded_payload = base64.urlsafe_b64encode(
-            json.dumps(payload, separators=(",", ":")).encode("utf-8")
-        )
-        print(encoded_payload)
-        decoded_back = json.loads(
-            base64.urlsafe_b64decode(encoded_payload).decode("utf-8")
-        )
-        print(decoded_back)
-
-        data["Payload"] = encoded_payload.decode("utf-8")
+    if "Payload" not in data and "Payload" != None:
+        data["Payload"] = payload
 
     try:
         with open(current_vault_path, "w") as current_vault_file:

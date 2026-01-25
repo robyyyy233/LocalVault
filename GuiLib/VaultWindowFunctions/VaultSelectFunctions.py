@@ -16,7 +16,10 @@ def show_current_vault_path(Label : CTkLabel, parts) -> None:
     with open(config_path, "r") as config_file_r:
         config = json.load(config_file_r)
 
-    vault_path = Path(config["Vault"]["current_vault"])
+    if config["Vault"]["current_vault"] == None:
+        vault_path = Path("None")
+    else:
+        vault_path = Path(config["Vault"]["current_vault"])
 
     vault_path_short = Path(*vault_path.parts[-parts:])
 
@@ -112,6 +115,7 @@ def check_current_vault_available() -> bool:
     config_path = VaultSetup.get_config_file_path()
 
     print("Configuration file: ", config_path)
+
 
     with open(config_path, "r") as config_file_r:
         config = json.load(config_file_r)

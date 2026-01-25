@@ -102,6 +102,8 @@ def master_password_not_set_actions(
 
 
 def create_config() -> None:
+
+
     #get appdata
     appdata_path = os.environ.get("APPDATA")
 
@@ -113,7 +115,9 @@ def create_config() -> None:
     os.makedirs(LocalVaultFolder, exist_ok=True)
 
 
+
     config_file = os.path.join(LocalVaultFolder, "config.json")
+
 
     default_config = {
         "Versions": {
@@ -121,11 +125,12 @@ def create_config() -> None:
             "vault_version": "1.0",
         },
         "Vault": {
-            "current_vault": "None",
+            "current_vault": None,
             "vault_version": "1.0",
             "vault_magic_string": "LVPM",
         }
     }
+
 
     # create config.json
     if not os.path.exists(config_file):
@@ -144,7 +149,7 @@ def check_saved_vault() -> bool:
     current_vault = config["Vault"]["current_vault"]
     print(f"Current Vault: {current_vault}")
 
-    if current_vault == "None":
+    if current_vault == None:
         return False
 
     return True
