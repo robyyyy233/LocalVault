@@ -8,13 +8,13 @@ from GuiLib.LoginWindowFunctions import VaultSetup
 # for encrypting
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 
 
 PASSWORD_MINIMUM_LENGTH = 8
 
 
-# get payload
+
 def get_payload() -> bytes:
 
     vault_path = VaultSetup.get_current_vault_path()
@@ -26,8 +26,35 @@ def get_payload() -> bytes:
     except (FileNotFoundError, json.decoder.JSONDecodeError):
         print("Error while getting payload")
         return
+    
+    del data
 
     return payload
+
+
+
+def write_enc_data(enc_data:  bytes):
+
+    vault_path = VaultSetup.get_current_vault_path()
+
+    try:
+        with open(vault_path, "r") as vr:
+            data = json.load(vr)
+        
+        data["Payload"] = enc_data.decode()
+
+        with open(vault_path, "w") as vw:
+            json.dump(data, vw, indent=4)
+        
+
+    except (json.JSONDecodeError, FileNotFoundError):
+        mbox.showerror("Error!", "Cannot write encrypted data back to the vault!")
+
+    del data
+    del enc_data
+    print("Encryption writed to vault!")
+
+        
 
 
 def derive_key(password: str) -> bytes:
@@ -71,30 +98,33 @@ def derive_key(password: str) -> bytes:
 
 def encrypt(key: bytes, data: bytes) -> bytes:
     fernet = Fernet(key)
+
+    #add a check if the data is already encrypted "gAAAAAB"
     encrypted = fernet.encrypt(data)
+
 
     return encrypted
 
 
 
-def decrypt(key: bytes) -> bytes:
-    vault_path = VaultSetup.get_current_vault_path()
-    
-    try:
-        with open(vault_path, "r") as vr:
-            data = json.load(vr)
-            enc_payload = data["Payload"]
-    except (FileNotFoundError, json.JSONDecodeError) as e:
-        raise RuntimeError(e)
-    
-    # add later error handling for wrong password
-    # if decryption fails show messagebox error
-    # and return to login window
-
+def decrypt(key: bytes) -> dict:   
+    enc_payload = get_payload()
     fernet = Fernet(key)
-    decrypted_payload = fernet.decrypt(enc_payload)
 
-    return decrypted_payload
+    try:
+
+        if not  enc_payload[:7] == "gAAAAAB":
+            print("Error! the payload is not encrypted")
+            return
+
+        #decrypt
+        decrypted_payload = fernet.decrypt(enc_payload).decode()
+        return json.loads(decrypted_payload)
+    
+    except InvalidToken as e:
+        mbox.showerror("Error!", "Failed to decrypt due to invalid password!")
+        return
+
 
 
 
@@ -105,10 +135,11 @@ def ask_sure_password() -> bool:
     )
     return answer
 
-
-def set_master_password(Entry: ctk.CTkEntry) -> None:
+#add back Entry: ctk.CTKEntry
+def set_master_password() -> None:
     # Get password
-    password = Entry.get()
+    #password = Entry.get()
+    password = "1234567890abcdef"
 
     if password == "" or len(password) < PASSWORD_MINIMUM_LENGTH:
         mbox.showerror(
@@ -124,17 +155,26 @@ def set_master_password(Entry: ctk.CTkEntry) -> None:
     # create payload
     VaultSetup.create_payload()
 
-    # encryp the tabs and passwords
-    # todo: do it later don t forget!!!
+    #get key
+    key = derive_key(password)
+    
+    #get payload
+    payload_data = get_payload()
+    payload_data = json.loads(payload_data).encode("utf-8")
 
-    # decrypt right after login
-    # show main window
-    pass
+    encrypted = encrypt(key, payload_data)
+    write_enc_data(encrypted)
+
+
+    #decrypt for debug
+
+    #show main window
 
 
 if __name__ == "__main__":
-    key = derive_key("1323")
-    decrypted_data = decrypt(key)
-    print(decrypted_data.decode())
+    key = derive_key("1234567890abcdef")
+    decrypted = decrypt(key)
 
-    #debug later somewhere is encoded twice
+
+#delete later        -> test encryption password     1234567890abcdef
+    
