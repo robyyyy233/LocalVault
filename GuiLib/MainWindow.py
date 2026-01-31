@@ -1,17 +1,21 @@
 import customtkinter as ctk
 
 # For bitmap
-from Resources import WindowsModule
+from GuiLib.Resources import WindowsModule
 
 
 from GuiLib.MainWindowFunctions import MainWindowFunctions as MainFunctions
 from GuiLib.MainWindowFunctions import TabsFunctions as TabsFunctions
-from NewTabTopLevel import SaveTab
+from GuiLib.NewTabTopLevel import SaveTab
 
 
 class MainWindow(ctk.CTk):
-    def __init__(self):  # add the key here
+    def __init__(self, vault_key: bytes): 
         super().__init__()
+
+        #key for encrypting/decrypting
+        self.vault_key = vault_key
+
 
         self.lift()
         self.focus_force()

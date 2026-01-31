@@ -7,7 +7,6 @@ import sys
 from pathlib import Path
 
 
-from . import LoginWindowMainFunctions as mainfuncs
 from GuiLib import SelectVaultWindow as VaultSelectWindow
 from .VaultSetup import get_config_file_path
 from GuiLib.Resources import WindowsModule as WM
@@ -84,20 +83,6 @@ def get_path_to_settings_png() -> str:
     return png_path
 
 
-def master_password_not_set_actions(
-    login_button: ctk.CTkButton,
-    master_entry: ctk.CTkEntry,
-    LoginWindow,
-    pathToFolder: str,
-) -> None:
-
-    login_button.configure(text="Register")
-    login_button.configure(
-        command=lambda: mainfuncs.show_message_box(
-            master_entry, LoginWindow, pathToFolder
-        )
-    )
-    master_entry.configure(placeholder_text="Set Master Password")
 
 
 
@@ -155,8 +140,7 @@ def check_saved_vault() -> bool:
     return True
 
 
-
-#show settings window
+5#show settings window
 def show_vault_selection_window(master, label) -> None:
 
 
@@ -165,6 +149,16 @@ def show_vault_selection_window(master, label) -> None:
     window.grab_set()
     window.focus_force()
     master.wait_window(window)
+
+
+
+def show_main_window(oldWindow) -> None:
+    
+    from GuiLib.MainWindow import MainWindow
+
+    oldWindow.destroy()
+    mainWindow = MainWindow()
+    mainWindow.mainloop()
 
 
 

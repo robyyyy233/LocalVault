@@ -33,7 +33,7 @@ def get_current_vault_path() -> Path:
     return config["Vault"]["current_vault"]
 
 
-def check_first_time_use(Entry: ctk.CTkEntry, Button: CTkButton) -> None:
+def check_first_time_use(Entry: ctk.CTkEntry, Button: CTkButton, oldWindow) -> None:
     # check if the vault has a payload
     vault_path = get_current_vault_path()
     if os.path.exists(vault_path):
@@ -46,7 +46,7 @@ def check_first_time_use(Entry: ctk.CTkEntry, Button: CTkButton) -> None:
 
                 Entry.configure(placeholder_text="Create a master password")
                 Button.configure(text="Set")
-                Button.configure(command=lambda: VaultUnlock.set_master_password())
+                Button.configure(command=lambda: VaultUnlock.set_master_password(Entry.get(), oldWindow))
             else:
                 print_with_time("Vault already has master password")
         except (FileNotFoundError, json.JSONDecodeError):

@@ -10,6 +10,8 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
 from cryptography.fernet import Fernet, InvalidToken
 
+import GuiLib.LoginWindowFunctions.LoginWindowSetupFunctions as SetupFuncs
+
 
 PASSWORD_MINIMUM_LENGTH = 8
 
@@ -119,14 +121,14 @@ def decrypt(key: bytes) -> dict:
 
         #decrypt
         decrypted_payload = fernet.decrypt(enc_payload).decode()
-        return json.loads(decrypted_payload)
+        return str(decrypted_payload)
     
     except InvalidToken as e:
         mbox.showerror("Error!", "Failed to decrypt due to invalid password!")
         return
 
 
-
+4
 
 def ask_sure_password() -> bool:
     answer = mbox.askyesno(
@@ -135,11 +137,8 @@ def ask_sure_password() -> bool:
     )
     return answer
 
-#add back Entry: ctk.CTKEntry
-def set_master_password() -> None:
-    # Get password
-    #password = Entry.get()
-    password = "1234567890abcdef"
+
+def set_master_password(password, oldWindow) -> None:
 
     if password == "" or len(password) < PASSWORD_MINIMUM_LENGTH:
         mbox.showerror(
@@ -160,21 +159,35 @@ def set_master_password() -> None:
     
     #get payload
     payload_data = get_payload()
-    payload_data = json.loads(payload_data).encode("utf-8")
+    payload_data = str(payload_data).encode("utf-8")
 
     encrypted = encrypt(key, payload_data)
     write_enc_data(encrypted)
 
+    decrypted = decrypt(key)
+    if decrypted:
+        print("Master password set successfully!")
+    
 
-    #decrypt for debug
+    SetupFuncs.show_main_window(oldWindow)
 
-    #show main window
+
+
+def login_user(password: str, oldWindow) -> None:
+
+    key = derive_key(password)
+
+    decrypted = decrypt(key)
+    if decrypted:
+        print("Login successful!")
+        SetupFuncs.show_main_window(oldWindow)
+    else:
+        print("Login failed!")
+
+
 
 
 if __name__ == "__main__":
-    key = derive_key("1234567890abcdef")
-    decrypted = decrypt(key)
+    pass
 
-
-#delete later        -> test encryption password     1234567890abcdef
     

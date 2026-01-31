@@ -6,13 +6,14 @@ from PIL import Image
 # For bitmap
 from GuiLib.Resources import WindowsModule
 
-from GuiLib.LoginWindowFunctions import LoginWindowMainFunctions as MainFuncs
+
 from GuiLib.LoginWindowFunctions import LoginWindowSetupFunctions as SetupFuncs
 from GuiLib.LoginWindowFunctions.VaultSetup import check_first_time_use
 from GuiLib.VaultWindowFunctions.VaultSelectFunctions import (
     check_current_vault_available,
     show_current_vault_path,
 )
+from GuiLib.LoginWindowFunctions.VaultUnlock import login_user
 
 
 class LoginWindow(ctk.CTk):
@@ -21,10 +22,6 @@ class LoginWindow(ctk.CTk):
 
         # creates the config file
         SetupFuncs.create_config()
-
-        # Create the folder to store the passwords
-        folder_path = MainFuncs.create_folder()
-        # master_password_exists = MainFuncs.check_user_has_master_password(folder_path)
 
         # Appearance
         ctk.set_appearance_mode("dark")
@@ -188,6 +185,7 @@ class LoginWindow(ctk.CTk):
             border_width=1,
             border_color="#1e3a8a",
             hover_color="#1d4ed8",
+            command=lambda: login_user(self.MasterPasswordEntry.get(), self)
         )
         self.LoginButton.grid(row=0, column=10, sticky="ns", padx=(0, 0))
 
@@ -220,7 +218,7 @@ class LoginWindow(ctk.CTk):
         # Handle window close event
         self.protocol("WM_DELETE_WINDOW", WindowsModule.on_close.__get__(self))
 
-        check_first_time_use(self.MasterPasswordEntry, self.LoginButton)
+        check_first_time_use(self.MasterPasswordEntry, self.LoginButton, oldWindow=self)
 
 
 if __name__ == "__main__":
