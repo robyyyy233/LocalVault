@@ -3,7 +3,7 @@ import json
 
 import customtkinter as ctk
 from tkinter import messagebox as mbox
-from GuiLib.LoginWindowFunctions import VaultSetup
+from GuiLib.VaultFunctions import VaultSetup
 
 # for encrypting
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -169,7 +169,7 @@ def set_master_password(password, oldWindow) -> None:
         print("Master password set successfully!")
     
 
-    SetupFuncs.show_main_window(oldWindow)
+    SetupFuncs.show_main_window(oldWindow, key)
 
 
 
@@ -180,7 +180,7 @@ def login_user(password: str, oldWindow) -> None:
     decrypted = decrypt(key)
     if decrypted:
         print("Login successful!")
-        SetupFuncs.show_main_window(oldWindow)
+        SetupFuncs.show_main_window(oldWindow, key)
     else:
         print("Login failed!")
 

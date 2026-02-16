@@ -56,12 +56,14 @@ class SaveTab(ctk.CTkToplevel):
         self.save_button = ctk.CTkButton(self.buttons_frame, fg_color="#24272B", text_color="#ffffff",
                                            text="Save", corner_radius=10, width=100, height=40, font=("Arial", 20),
                                            border_width=1, border_color="#3A3D41", hover_color="#3A3D41",
-                                           command=lambda: Tabs.add_tab(master, self.tabs_entry, tabs_frame, self),)
+                                           command=lambda: Tabs.add_tab(master, self.tabs_entry.get(), self))
 
         self.save_button.grid(row=0, column=1, padx=(35, 0), pady=(0, 0), sticky="nsew")
 
-        self.bind("<Return>", lambda e: Tabs.add_tab(master, self.tabs_entry, tabs_frame, self))
+
+        self.bind("<Return>", lambda e: Tabs.add_tab(master, self.tabs_entry.get(), self))
         self.tabs_entry.focus_force()
+
 
         self.lift()
         self.focus_force()

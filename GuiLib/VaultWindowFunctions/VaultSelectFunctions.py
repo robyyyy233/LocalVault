@@ -6,7 +6,7 @@ import os
 
 from customtkinter import CTkLabel
 
-from GuiLib.LoginWindowFunctions import VaultSetup as VaultSetup
+from GuiLib.VaultFunctions import VaultSetup as VaultSetup
 
 
 
@@ -103,7 +103,10 @@ def on_close_toplevel(self, Label: CTkLabel, master) -> None:
     self.destroy()
     show_current_vault_path(Label, 3)
     if master:
-        master.mainloop()
+        try:
+            master.focus_force()
+        except Exception:
+            pass
 
 
 def vault_not_in_saved_location() -> None:

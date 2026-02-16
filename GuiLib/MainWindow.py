@@ -3,8 +3,9 @@ import customtkinter as ctk
 # For bitmap
 from GuiLib.Resources import WindowsModule
 
+#vault functions
+import GuiLib.VaultFunctions.VaultUnlock as VaultUnlock
 
-from GuiLib.MainWindowFunctions import MainWindowFunctions as MainFunctions
 from GuiLib.MainWindowFunctions import TabsFunctions as TabsFunctions
 from GuiLib.NewTabTopLevel import SaveTab
 
@@ -15,6 +16,8 @@ class MainWindow(ctk.CTk):
 
         #key for encrypting/decrypting
         self.vault_key = vault_key
+        vault_key = None
+        del vault_key
 
 
         self.lift()
@@ -39,10 +42,8 @@ class MainWindow(ctk.CTk):
         # Icon bitmap
         self.icon_path = WindowsModule.get_path_to_BitMap()
         self.iconbitmap(self.icon_path)
-
-        # Create settings tab
-        settings_path = MainFunctions.create_settings_json()
-        TabsFunctions.add_default_tab(settings_path)
+    
+    
 
         # Grid Columns:
         # 0 = tabs frame
@@ -75,10 +76,14 @@ class MainWindow(ctk.CTk):
         )
         self.TabsFrameLocation.grid(row=0, column=0, rowspan=5, sticky="nsew")
 
+        
+        #Open vault and decrypt and show tabs
+        self.vault_data = VaultUnlock.decrypt(self.vault_key)   
+        
+        
         # render tabs
-        self.buttons: list = TabsFunctions.render_tabs(
-            self, settings_path, self.TabsFrameLocation
-        )
+        TabsFunctions.render_tabs(self)
+        
 
         self.button_tabs = ctk.CTkFrame(
             self.left_frame, fg_color="transparent", width=180, height=60

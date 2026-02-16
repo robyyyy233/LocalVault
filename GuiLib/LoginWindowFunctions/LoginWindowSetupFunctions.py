@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 from GuiLib import SelectVaultWindow as VaultSelectWindow
-from .VaultSetup import get_config_file_path
+from ..VaultFunctions.VaultSetup import check_first_time_use, get_config_file_path
 from GuiLib.Resources import WindowsModule as WM
 
 
@@ -140,8 +140,8 @@ def check_saved_vault() -> bool:
     return True
 
 
-5#show settings window
-def show_vault_selection_window(master, label) -> None:
+#show settings window
+def show_vault_selection_window(master, label, on_close=None) -> None:
 
 
     window = VaultSelectWindow.SelectVaultWindow(master, label)
@@ -150,15 +150,19 @@ def show_vault_selection_window(master, label) -> None:
     window.focus_force()
     master.wait_window(window)
 
+    if callable(on_close):
+        on_close()
 
 
-def show_main_window(oldWindow) -> None:
+
+def show_main_window(oldWindow, vault_key: bytes) -> None:
     
     from GuiLib.MainWindow import MainWindow
 
     oldWindow.destroy()
-    mainWindow = MainWindow()
+    mainWindow = MainWindow(vault_key)
     mainWindow.mainloop()
+    
 
 
 

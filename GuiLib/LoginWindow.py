@@ -8,12 +8,12 @@ from GuiLib.Resources import WindowsModule
 
 
 from GuiLib.LoginWindowFunctions import LoginWindowSetupFunctions as SetupFuncs
-from GuiLib.LoginWindowFunctions.VaultSetup import check_first_time_use
+from GuiLib.VaultFunctions.VaultSetup import check_first_time_use
 from GuiLib.VaultWindowFunctions.VaultSelectFunctions import (
     check_current_vault_available,
     show_current_vault_path,
 )
-from GuiLib.LoginWindowFunctions.VaultUnlock import login_user
+from GuiLib.VaultFunctions.VaultUnlock import login_user
 
 
 class LoginWindow(ctk.CTk):
@@ -22,7 +22,8 @@ class LoginWindow(ctk.CTk):
 
         # creates the config file
         SetupFuncs.create_config()
-
+        
+        
         # Appearance
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("dark-blue")
@@ -95,7 +96,11 @@ class LoginWindow(ctk.CTk):
             height=10,
             cursor="hand2",
             command=lambda: SetupFuncs.show_vault_selection_window(
-                self, self.CurrentVaultLabel
+                self,
+                self.CurrentVaultLabel,
+                on_close=lambda: check_first_time_use(
+                    self.MasterPasswordEntry, self.LoginButton, oldWindow=self
+                ),
             ),
         )
         self.SettingsButton.grid(row=0, column=0, sticky="nsew")
@@ -189,6 +194,10 @@ class LoginWindow(ctk.CTk):
         )
         self.LoginButton.grid(row=0, column=10, sticky="ns", padx=(0, 0))
 
+        # Enter key triggers unlock/set (ensure single binding)
+        self.MasterPasswordEntry.unbind("<Return>")
+        self.MasterPasswordEntry.bind("<Return>", lambda event: self.LoginButton.invoke())
+
         # show current vault
         self.CurrentVaultFrame = ctk.CTkFrame(
             self.MainFrame, fg_color="transparent", height=30
@@ -209,16 +218,29 @@ class LoginWindow(ctk.CTk):
 
         # check if user saved a vault and if not open the window
         if not SetupFuncs.check_saved_vault():
-            SetupFuncs.show_vault_selection_window(self, self.CurrentVaultLabel)
+            SetupFuncs.show_vault_selection_window(
+                self,
+                self.CurrentVaultLabel,
+                on_close=lambda: check_first_time_use(
+                    self.MasterPasswordEntry, self.LoginButton, oldWindow=self
+                ),
+            )
 
         # check if the current vault has been moved from saved location
         if not check_current_vault_available():
-            SetupFuncs.show_vault_selection_window(self, self.CurrentVaultLabel)
+            SetupFuncs.show_vault_selection_window(
+                self,
+                self.CurrentVaultLabel,
+                on_close=lambda: check_first_time_use(
+                    self.MasterPasswordEntry, self.LoginButton, oldWindow=self
+                ),
+            )
+
+        check_first_time_use(self.MasterPasswordEntry, self.LoginButton, oldWindow=self)
 
         # Handle window close event
         self.protocol("WM_DELETE_WINDOW", WindowsModule.on_close.__get__(self))
 
-        check_first_time_use(self.MasterPasswordEntry, self.LoginButton, oldWindow=self)
 
 
 if __name__ == "__main__":
