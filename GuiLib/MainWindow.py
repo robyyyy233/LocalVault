@@ -25,8 +25,8 @@ class MainWindow(ctk.CTk):
         self.attributes("-topmost", True)
         self.after(200, lambda: self.attributes("-topmost", False))
 
-        delete_tab_mode: bool = False
-        self.buttons: list = []
+        self.delete_tab_mode: bool = False
+        self.tab_buttons: list = []
 
         self.configure(fg_color="#0f1215")
         ctk.set_default_color_theme("dark-blue")
@@ -120,13 +120,7 @@ class MainWindow(ctk.CTk):
         )
 
         self.delete_tab_button.configure(
-            command=lambda b=self.delete_tab_button: setattr(
-                self,
-                "buttons",  # name of the attribute where you want to store the list
-                TabsFunctions.delete_button_tab_configurate(
-                    self, delete_tab_mode, b, self.TabsFrameLocation
-                ),
-            )
+            command=lambda: TabsFunctions.delete_tab_mode(self)
         )
         self.delete_tab_button.grid(
             row=0, column=1, padx=(0, 0), pady=(0, 7), sticky="ew"
