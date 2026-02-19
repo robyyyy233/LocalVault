@@ -1,7 +1,10 @@
 import customtkinter as ctk
+from PIL import Image
 
 # For bitmap
 from GuiLib.Resources import WindowsModule
+
+import GuiLib.LoginWindowFunctions.LoginWindowSetupFunctions as SetupFuncs
 
 #vault functions
 import GuiLib.VaultFunctions.VaultUnlock as VaultUnlock
@@ -154,7 +157,7 @@ class MainWindow(ctk.CTk):
 
         # buttons frame
         self.buttons_frame = ctk.CTkFrame(
-            self.main_frame, fg_color="#1a1c1f", height=80
+            self.main_frame, fg_color="#0f1215", height=80
         )
         self.buttons_frame.grid(
             row=0,
@@ -165,7 +168,60 @@ class MainWindow(ctk.CTk):
             pady=(10, 10),
         )
 
-        # Make the add a new password that creates a top level window
+        # Column 2 expands to push settings button to the right
+        self.buttons_frame.grid_columnconfigure(2, weight=1)
+
+        # Settings button
+        settings_image = Image.open(SetupFuncs.get_path_to_settings_png())
+        self.ctk_settings_image = ctk.CTkImage(dark_image=settings_image, size=(40, 40))
+
+        self.settings_button = ctk.CTkButton(
+            self.buttons_frame,
+            text="",
+            image=self.ctk_settings_image,
+            fg_color="transparent",
+            hover_color="#0f1215",
+            corner_radius=8,
+            width=42,
+            height=42,
+            border_width=0,
+            command=lambda: print("Settings button clicked"),
+        )
+        self.settings_button.grid(row=0, column=3, padx=(5, 10), pady=(10, 10), sticky="e")
+
+        # Add Password button
+        self.add_password_button = ctk.CTkButton(
+            self.buttons_frame,
+            text="Add Password",
+            font=("Arial", 18),
+            fg_color="#22262b",
+            text_color="#ffffff",
+            corner_radius=8,
+            width=160,
+            height=42,
+            border_width=1,
+            border_color="#2e3338",
+            hover_color="#2c3139",
+            command=lambda: print("Add Password button clicked"),
+        )
+        self.add_password_button.grid(row=0, column=0, padx=(10, 5), pady=(10, 10))
+
+        # Generate Password button
+        self.generate_button = ctk.CTkButton(
+            self.buttons_frame,
+            text="Generate",
+            font=("Arial", 18),
+            fg_color="#22262b",
+            text_color="#ffffff",
+            corner_radius=8,
+            width=160,
+            height=42,
+            border_width=1,
+            border_color="#2e3338",
+            hover_color="#2c3139",
+            command=lambda: print("Generate button clicked"),
+        )
+        self.generate_button.grid(row=0, column=1, padx=(5, 5), pady=(10, 10))
 
         # main frame separator
         self.main_frame_separator = ctk.CTkFrame(
