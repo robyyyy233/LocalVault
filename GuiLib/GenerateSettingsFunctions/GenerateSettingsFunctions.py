@@ -14,6 +14,16 @@ def show_generate_settings(master):
     master._gen_settings_window = GenerateSettingsTopLevel(master)
 
 
+def show_generate_window(master):
+    """Show the generate passwords/email window. If already open, bring it to focus."""
+    from GuiLib.GeneratePasswordsTopLevel import GeneratePasswordsTopLevel
+    if hasattr(master, "_gen_window") and master._gen_window.winfo_exists():
+        master._gen_window.lift()
+        master._gen_window.focus_force()
+        return
+    master._gen_window = GeneratePasswordsTopLevel(master)
+
+
 
 def enforce_at_least_one(lowercase_var, uppercase_var, numbers_var, symbols_var, toggled_var):
     """Prevent turning off the last enabled toggle. Re-enables the toggled switch if all are off."""

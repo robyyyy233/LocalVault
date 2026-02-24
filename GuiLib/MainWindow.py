@@ -14,6 +14,8 @@ from GuiLib.MainWindowFunctions import TabsFunctions as TabsFunctions
 from GuiLib.NewTabTopLevel import SaveTab
 
 from GuiLib.GenerateSettingsFunctions import GenerateSettingsFunctions as SettingsFuncs
+from GuiLib.TopLevelPasswordFunctions import SavePasswordTopLevelFunctions as SaveFuncs
+from GuiLib.MainWindowFunctions import PasswordListFunctions
 
 
 class MainWindow(ctk.CTk):
@@ -37,6 +39,7 @@ class MainWindow(ctk.CTk):
 
         self.delete_tab_mode: bool = False
         self.tab_buttons: list = []
+        self.current_tab: str = "All"
 
         self.configure(fg_color="#0f1215")
         ctk.set_default_color_theme("dark-blue")
@@ -205,7 +208,7 @@ class MainWindow(ctk.CTk):
             border_width=1,
             border_color="#2e3338",
             hover_color="#2c3139",
-            command=lambda: print("Add Password button clicked"),
+            command=lambda: SaveFuncs.show_add_password_window(self),
         )
         self.add_password_button.grid(row=0, column=0, padx=(10, 5), pady=(10, 10))
 
@@ -222,9 +225,19 @@ class MainWindow(ctk.CTk):
             border_width=1,
             border_color="#2e3338",
             hover_color="#2c3139",
-            command=lambda: print("Generate button clicked"),
+            command=lambda: SettingsFuncs.show_generate_window(self),
         )
         self.generate_button.grid(row=0, column=1, padx=(5, 5), pady=(10, 10))
+
+        # Current tab indicator
+        self.current_tab_label = ctk.CTkLabel(
+            self.buttons_frame,
+            text="All",
+            text_color="#9a9a9a",
+            font=("Arial", 15),
+            anchor="e",
+        )
+        self.current_tab_label.grid(row=0, column=2, padx=(10, 5), sticky="e")
 
         # main frame separator
         self.main_frame_separator = ctk.CTkFrame(
@@ -239,7 +252,11 @@ class MainWindow(ctk.CTk):
         )
 
         # password list display frame
-        self.password_list_frame = ctk.CTkFrame(self.main_frame, fg_color="#1a1c1f")
+        self.password_list_frame = ctk.CTkScrollableFrame(
+            self.main_frame, fg_color="#0f1215",
+            scrollbar_button_color="#26292d",
+            scrollbar_button_hover_color="#3A3D41",
+        )
         self.password_list_frame.grid(
             row=2,
             column=0,
@@ -250,14 +267,7 @@ class MainWindow(ctk.CTk):
             pady=(10, 10),
         )
 
-        # Remove this later
-        self.passwordListLabel = ctk.CTkLabel(
-            self.password_list_frame,
-            text="Password List Frame",
-            justify="center",
-            font=("Arial", 20),
-        )
-        self.passwordListLabel.place(relx=0.5, rely=0.5, anchor="center")
+        PasswordListFunctions.render_passwords(self)
 
         # Handle window close
         self.protocol("WM_DELETE_WINDOW", WindowsModule.on_close.__get__(self))

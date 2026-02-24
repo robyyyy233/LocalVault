@@ -11,7 +11,9 @@ class GenerateSettingsTopLevel(ctk.CTkToplevel):
         self.geometry("450x350")
         self.resizable(False, False)
 
-        
+        self.after(250, lambda: (self.attributes("-topmost", True), self.lift(), self.focus_force()))
+        self.after(450, lambda: self.attributes("-topmost", False))
+
         #gets password settings and email settings
         self.password_generator_settings, self.email_generator_settings = GSettingsFuncs.get_generator_settings()
 

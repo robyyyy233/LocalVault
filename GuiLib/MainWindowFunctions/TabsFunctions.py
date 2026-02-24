@@ -55,29 +55,70 @@ def add_tab(mainWin, tab_name, top_window):
     
     
 
+def select_tab(self, tab_name):
+    """Set the active tab, update the label, highlight the button, re-render passwords."""
+    from GuiLib.MainWindowFunctions import PasswordListFunctions
+    self.current_tab = tab_name
+
+    if hasattr(self, "current_tab_label"):
+        self.current_tab_label.configure(text=tab_name)
+
+    for btn in self.tab_buttons:
+        btn_text = btn.cget("text")
+        is_unassigned = btn_text == "Unassigned"
+        if btn_text == tab_name:
+            fg = "#4a3510" if is_unassigned else "#1C2F63"
+            hover = "#4a3510" if is_unassigned else "#233A78"
+        else:
+            fg = "#1a1c1f"
+            hover = "#4a3510" if is_unassigned else "#31508D"
+        btn.configure(fg_color=fg, hover_color=hover)
+
+    PasswordListFunctions.render_passwords(self)
+
+
 #render tabs
 def render_tabs(self):
-    
+
     # delete all previous tabs
     for widget in self.TabsFrameLocation.winfo_children():
         widget.destroy()
-    
+
     self.tab_buttons = []
-    
+    active = getattr(self, "current_tab", "All")
+
     # render new tabs
     Tabs = self.vault_data.get("Tabs", [])
     for tab in Tabs:
-        button = ctk.CTkButton(self.TabsFrameLocation, fg_color="#1a1c1f", text_color="#ffffff",
+        fg = "#1C2F63" if tab == active else "#1a1c1f"
+        hover = "#233A78" if tab == active else "#31508D"
+        button = ctk.CTkButton(self.TabsFrameLocation, fg_color=fg, text_color="#ffffff",
                                 text=tab, corner_radius=6, width=170,
                                 height=40, font=("Arial", 20),
-                                hover_color="#31508D",
-                                command=lambda t=tab: print(f"Clicked on tab: {t}"))
+                                hover_color=hover,
+                                command=lambda t=tab: select_tab(self, t))
         button.pack(pady=5, anchor="nw")
         self.tab_buttons.append(button)
-        
+
     Tabs = None
     del Tabs
-    
+
+    # Unassigned virtual button — only appears when passwords have no tab assigned
+    unassigned = [p for p in self.vault_data.get("Passwords", []) if not p.get("tab")]
+    if unassigned:
+        fg = "#4a3510" if active == "Unassigned" else "#1a1c1f"
+        btn = ctk.CTkButton(
+            self.TabsFrameLocation,
+            fg_color=fg, text_color="#d4a017",
+            text="Unassigned",
+            corner_radius=6, width=170, height=40,
+            font=("Arial", 18),
+            hover_color="#4a3510",
+            command=lambda: select_tab(self, "Unassigned"),
+        )
+        btn.pack(pady=(10, 5), anchor="nw")
+        self.tab_buttons.append(btn)
+
 
 def delete_tab_mode(self):
     """Toggle delete mode on/off. When on, clicking a tab deletes it."""
@@ -90,27 +131,37 @@ def delete_tab_mode(self):
         for btn in self.tab_buttons:
             tab_name = btn.cget("text")
             
-            #all buttons can be deleted beside "All"
-            if not btn.cget("text") == "All":
+            if tab_name not in ("All", "Unassigned"):
                 btn.configure(
                     fg_color="#9A3131",
                     hover_color="#B03838",
                     command=lambda t=tab_name: delete_tab(self, t),
                 )
             else:
-                btn.configure(command=lambda t=tab_name: messagebox.showinfo("INFO", f'"{t}" tab cannot be deleted!'))
+                btn.configure(command=lambda t=tab_name: messagebox.showinfo("INFO", f'"{t}" cannot be deleted.'))
             
     else:
         # DELETE MODE OFF — restore normal appearance & commands
         self.delete_tab_button.configure(fg_color="#9A3131", text="Delete Tab")
 
+        active = getattr(self, "current_tab", "All")
         for btn in self.tab_buttons:
             tab_name = btn.cget("text")
-            btn.configure(
-                fg_color="#1a1c1f",
-                hover_color="#31508D",
-                command=lambda t=tab_name: print(f"Clicked on tab: {t}"),
-            )
+            if tab_name == "Unassigned":
+                fg = "#4a3510" if tab_name == active else "#1a1c1f"
+                btn.configure(
+                    fg_color=fg,
+                    hover_color="#4a3510",
+                    command=lambda: select_tab(self, "Unassigned"),
+                )
+            else:
+                fg = "#1C2F63" if tab_name == active else "#1a1c1f"
+                hover = "#233A78" if tab_name == active else "#31508D"
+                btn.configure(
+                    fg_color=fg,
+                    hover_color=hover,
+                    command=lambda t=tab_name: select_tab(self, t),
+                )
 
 
 def delete_tab(self, tab_name):
@@ -122,15 +173,29 @@ def delete_tab(self, tab_name):
     if tab_name in self.vault_data.get("Tabs", []):
         self.vault_data["Tabs"].remove(tab_name)
 
-        # Encrypt and write back
-        encrypted = VaultUnlock.encrypt(self.vault_key, str(self.vault_data).encode("utf-8"))
-        VaultUnlock.write_enc_data(encrypted)
-        self.vault_data = VaultUnlock.decrypt(self.vault_key)
+    # Clear tab field from any passwords that belonged to this tab
+    for p in self.vault_data.get("Passwords", []):
+        if p.get("tab") == tab_name:
+            p["tab"] = ""
+
+    # Encrypt and write back
+    encrypted = VaultUnlock.encrypt(self.vault_key, str(self.vault_data).encode("utf-8"))
+    VaultUnlock.write_enc_data(encrypted)
+    self.vault_data = VaultUnlock.decrypt(self.vault_key)
+
+    # If the deleted tab was active, fall back to All
+    if self.current_tab == tab_name:
+        self.current_tab = "All"
+        if hasattr(self, "current_tab_label"):
+            self.current_tab_label.configure(text="All")
 
     # Exit delete mode and re-render
     self.delete_tab_mode = False
     self.delete_tab_button.configure(fg_color="#9A3131", text="Delete Tab")
     render_tabs(self)
+
+    from GuiLib.MainWindowFunctions import PasswordListFunctions
+    PasswordListFunctions.render_passwords(self)
     
         
 
