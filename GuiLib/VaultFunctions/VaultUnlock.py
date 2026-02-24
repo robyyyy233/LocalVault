@@ -25,7 +25,7 @@ def get_payload() -> bytes:
         with open(vault_path, "r") as fr:
             data = json.load(fr)
             payload = data["Payload"]
-    except (FileNotFoundError, json.decoder.JSONDecodeError):
+    except (FileNotFoundError, json.decoder.JSONDecodeError, KeyError):
         print("Error while getting payload")
         return
     

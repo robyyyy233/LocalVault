@@ -21,3 +21,6 @@ Thumbs.db
 
 # ignore vscode
 .vscode/
+
+# ignore claude
+.claude/

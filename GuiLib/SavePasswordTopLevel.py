@@ -1,6 +1,6 @@
 import customtkinter as ctk
 
-from TopLevelPasswordFunctions import SavePasswordTopLevelFunctions as MainFunctions
+from GuiLib.TopLevelPasswordFunctions import SavePasswordTopLevelFunctions as MainFunctions
 
 
 
@@ -171,6 +171,8 @@ class AddPasswordTopLevel(ctk.CTkToplevel):
 
 
 if __name__ == "__main__":
-
-    window = AddPasswordTopLevel()
-    window.mainloop()
+    root = ctk.CTk()
+    root.withdraw()  # hide the root window
+    window = AddPasswordTopLevel(master=root)
+    window.protocol("WM_DELETE_WINDOW", root.destroy)
+    root.mainloop()

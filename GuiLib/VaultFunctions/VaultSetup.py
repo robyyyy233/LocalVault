@@ -9,9 +9,6 @@ from customtkinter import CTkButton
 from tkinter import messagebox as mbox
 import base64
 
-from GuiLib.VaultFunctions import VaultUnlock as VaultUnlock
-
-
 def print_with_time(message: str) -> None:
     time = datetime.now().strftime("%H:%M:%S")
     print(f"[{time}]  {message}")
@@ -49,6 +46,7 @@ def check_first_time_use(Entry: ctk.CTkEntry, Button: CTkButton, oldWindow) -> N
             if not "Payload" in data:
                 print_with_time("First time use")
 
+                from GuiLib.VaultFunctions import VaultUnlock
                 Entry.configure(placeholder_text="Create a master password")
                 Button.configure(text="Set")
                 Button.configure(command=lambda: VaultUnlock.set_master_password(Entry.get(), oldWindow))
@@ -86,6 +84,19 @@ def create_vault(vault_path: Path):
             "iterations": 600_000,
             "salt": salt_hex,
             "vault_id": vault_id,
+        },
+        "Generator Settings": {
+            "Password": {
+                "length": 12,
+                "lower": True,
+                "upper": True,
+                "numbers": True,
+                "symbols": True,
+            },
+            "Email": {
+                "domain": "",
+                "numbers_length": 6
+            }
         }
     }
 
@@ -97,6 +108,67 @@ def create_vault(vault_path: Path):
     with open(config_path, "w") as config_write:
         config["Vault"]["current_vault"] = str(vault_path)
         json.dump(config, config_write, indent=4)
+        
+        
+        
+def add_generator_settings() -> None:
+    vault_path = get_current_vault_path()
+    
+    try:
+        with open(vault_path, "r") as vr:
+            data = json.load(vr)
+            vr.close()
+        
+        generator_settings = {
+            "Generator Settings": {
+                "Password": {
+                    "length": 12,
+                    "lower": True,
+                    "upper": True,
+                    "numbers": True,
+                    "symbols": True
+                },
+                "Email": {
+                    "domain": "",
+                    "numbers_length": 6
+                }
+            }
+        }
+        
+        new_data = {
+            "Metadata": data["Metadata"],
+            "Generator Settings": generator_settings["Generator Settings"],
+            "Payload": data["Payload"]
+        }
+                  
+        
+        with open(vault_path, "w") as vw:
+            json.dump(new_data, vw, indent=4) 
+            vw.close() 
+         
+    except(json.JSONDecodeError, KeyError):
+        print("Something went wrong in 'add_generator_settings'")
+
+
+
+def check_generator_settings() -> None:
+    vault_path = get_current_vault_path()
+    
+    try:
+        with open(vault_path, "r") as vr:
+            data = json.load(vr)
+            
+            #check if generator settings
+            if "Generator Settings" in data:
+                print("Generator settings exists")
+            else:
+                add_generator_settings()
+                check_generator_settings()
+                
+    except(json.JSONDecodeError, KeyError) as error:
+        print("Something went wrong in 'check_generator_settings'")
+        print(error)
+                
 
 
 def create_payload() -> None:
@@ -129,5 +201,5 @@ def create_payload() -> None:
 
 
 if __name__ == "__main__":
-    create_payload()
+    add_generator_settings()
     

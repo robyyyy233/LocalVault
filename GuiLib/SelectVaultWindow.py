@@ -1,4 +1,5 @@
 from tkinter import PhotoImage
+import ctypes
 
 import customtkinter as ctk
 
@@ -62,8 +63,28 @@ class SelectVaultWindow(ctk.CTkToplevel):
         self.update()
         self.focus_force()
 
+        # Dark title bar on Windows
+        self.after(100, self._set_dark_title_bar)
+
 
         self.protocol("WM_DELETE_WINDOW", lambda: VaultSelectFuncs.on_close_toplevel(self, CurrentVaultMain, master))
+
+    def _set_dark_title_bar(self):
+        """Force dark title bar on Windows 10/11."""
+        try:
+            self.update_idletasks()
+            hwnd = ctypes.windll.user32.GetParent(self.winfo_id())
+            result = ctypes.windll.dwmapi.DwmSetWindowAttribute(
+                hwnd, 20, ctypes.byref(ctypes.c_int(1)), ctypes.sizeof(ctypes.c_int)
+            )
+            if result != 0:
+                ctypes.windll.dwmapi.DwmSetWindowAttribute(
+                    hwnd, 19, ctypes.byref(ctypes.c_int(1)), ctypes.sizeof(ctypes.c_int)
+                )
+            self.withdraw()
+            self.deiconify()
+        except Exception:
+            pass
 
 
 

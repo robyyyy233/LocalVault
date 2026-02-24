@@ -8,9 +8,12 @@ import GuiLib.LoginWindowFunctions.LoginWindowSetupFunctions as SetupFuncs
 
 #vault functions
 import GuiLib.VaultFunctions.VaultUnlock as VaultUnlock
+from GuiLib.VaultFunctions.VaultSetup import get_current_vault_path
 
 from GuiLib.MainWindowFunctions import TabsFunctions as TabsFunctions
 from GuiLib.NewTabTopLevel import SaveTab
+
+from GuiLib.GenerateSettingsFunctions import GenerateSettingsFunctions as SettingsFuncs
 
 
 class MainWindow(ctk.CTk):
@@ -22,6 +25,10 @@ class MainWindow(ctk.CTk):
         vault_key = None
         del vault_key
 
+        #Open vault and decrypt
+        self.vault_data = VaultUnlock.decrypt(self.vault_key) 
+        self.vault_path = get_current_vault_path()
+        
 
         self.lift()
         self.focus_force()
@@ -78,10 +85,6 @@ class MainWindow(ctk.CTk):
             scrollbar_button_hover_color="#1D2F60",
         )
         self.TabsFrameLocation.grid(row=0, column=0, rowspan=5, sticky="nsew")
-
-        
-        #Open vault and decrypt and show tabs
-        self.vault_data = VaultUnlock.decrypt(self.vault_key)   
         
         
         # render tabs
@@ -185,7 +188,7 @@ class MainWindow(ctk.CTk):
             width=42,
             height=42,
             border_width=0,
-            command=lambda: print("Settings button clicked"),
+            command=lambda: SettingsFuncs.show_generate_settings(self),
         )
         self.settings_button.grid(row=0, column=3, padx=(5, 10), pady=(10, 10), sticky="e")
 
